@@ -42,7 +42,8 @@ function boot() {
   gameSelect.addEventListener("change", () => loadGame(games[Number(gameSelect.value)]));
   commandForm.addEventListener("submit", onCommand);
   commandInput.addEventListener("keydown", onInputKeydown);
-  loadGame(games[0]);
+  if (games.length) loadGame(games[0]);
+  else renderEmptyArchive();
 }
 
 function loadGame(game) {
@@ -55,6 +56,7 @@ function loadGame(game) {
 
 function onCommand(event) {
   event.preventDefault();
+  if (!engine) return;
   const command = commandInput.value.trim();
   if (!command) return;
   commandHistory.push(command);
@@ -79,6 +81,11 @@ function onInputKeydown(event) {
 }
 
 function render() {
+  if (!engine) {
+    renderEmptyArchive();
+    return;
+  }
+
   const view = engine.getView();
   statusBar.textContent = view.status.join(" · ");
   suggestions.textContent = `Try: ${view.suggestions.join(", ")}`;
@@ -106,6 +113,24 @@ function renderTab(tab, view) {
   if (tab === "Places") return renderList("Places", view.places);
   if (tab === "Knowledge") return renderList("Knowledge", view.knowledge);
   return renderList("Inventory", view.inventory);
+}
+
+function renderEmptyArchive() {
+  statusBar.textContent = "NO ARCHIVES LOADED";
+  suggestions.textContent = "Add a game to src/games and register it in src/games/index.js.";
+  gameSelect.disabled = true;
+  commandInput.disabled = true;
+  commandInput.placeholder = "No game selected";
+
+  transcript.replaceChildren(emptyMessage("No stories are currently installed."));
+  tabPanel.replaceChildren(renderList(activeTab, []));
+}
+
+function emptyMessage(text) {
+  const block = document.createElement("section");
+  block.className = "entry system";
+  block.textContent = text;
+  return block;
 }
 
 function renderMap(view) {

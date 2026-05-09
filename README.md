@@ -1,6 +1,6 @@
 # Text Adventure Engine
 
-Browser-based text adventure engine with a separate sample game.
+Browser-based text adventure engine. No stories are currently installed.
 
 ## Run
 
@@ -17,10 +17,10 @@ Open `http://127.0.0.1:8000`.
 - `src/engine/AdventureEngine.js` owns game state, turns, movement, object interaction, conversations, knowledge, inventory, story notes, and atmospheric events.
 - `src/engine/commands.js` parses plain text commands.
 - `src/engine/text.js` renders highlighted nouns marked as `[[noun]]`.
-- `src/games/kepler-station.js` is the current grounded larger test story.
-- `src/games/rainglass-house.js` is an older supernatural test story.
-- `src/games/lantern-room.js` is a short standalone regression story with a winning condition.
-- `src/games/index.js` is the game registry. Add future games here.
+- `src/games/index.js` is the game registry.
+- `src/games/[game-id]/game.js` contains the game logic.
+- `src/games/[game-id]/world.md` contains the foundational world-building (Step 1 of the Design Process).
+- `src/games/[game-id]/puzzles.md` contains the puzzle dependency graph (Step 5 of the Design Process).
 
 Locations can define `map: { x, y }` coordinates for the notebook map. Coordinates are percentages from 0 to 100. If a location has no map coordinates, the engine falls back to a simple grid position.
 

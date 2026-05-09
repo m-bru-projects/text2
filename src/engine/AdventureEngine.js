@@ -277,8 +277,9 @@ export class AdventureEngine {
     for (const id of effects.removeKnowledge ?? []) this.state.knowledge.delete(id);
     for (const id of effects.removeInventory ?? []) this.state.inventory.delete(id);
     for (const [personId, locationId] of Object.entries(effects.movePerson ?? {})) {
-      if (this.game.people[personId]) this.game.people[personId].locationId = locationId;
+      if (this.game.people?.[personId]) this.game.people[personId].locationId = locationId;
     }
+    if (effects.ended) this.state.ended = true;
     if (effects.win) this.win(effects.win);
   }
 
@@ -413,15 +414,15 @@ export class AdventureEngine {
   }
 
   visiblePeople() {
-    return Object.values(this.game.people).filter((person) => this.state.talkedTo.has(person.id) || this.isAccessible(person));
+    return Object.values(this.game.people ?? {}).filter((person) => this.state.talkedTo.has(person.id) || this.isAccessible(person));
   }
 
   visibleKnowledge() {
-    return this.itemsFromIds(this.game.knowledge, this.state.knowledge).filter((item) => item.conversation !== false);
+    return this.itemsFromIds(this.game.knowledge ?? {}, this.state.knowledge).filter((item) => item.conversation !== false);
   }
 
   visibleInventory() {
-    return this.itemsFromIds(this.game.items, this.state.inventory);
+    return this.itemsFromIds(this.game.items ?? {}, this.state.inventory);
   }
 
   resolveConversationTopic(topic) {
@@ -451,18 +452,18 @@ export class AdventureEngine {
     const location = this.currentLocation();
     const pools = [
       ...Object.values(location.nouns ?? {}),
-      ...Object.values(this.game.items),
-      ...Object.values(this.game.people),
+      ...Object.values(this.game.items ?? {}),
+      ...Object.values(this.game.people ?? {}),
     ];
     return pools.find((entry) => this.matches(entry, target) && this.isAccessible(entry));
   }
 
   findItem(target) {
-    return Object.values(this.game.items).find((entry) => this.matches(entry, target));
+    return Object.values(this.game.items ?? {}).find((entry) => this.matches(entry, target));
   }
 
   findPerson(target) {
-    return Object.values(this.game.people).find((entry) => this.matches(entry, target));
+    return Object.values(this.game.people ?? {}).find((entry) => this.matches(entry, target));
   }
 
   actionTermMatches(term, target, extraAliases = []) {
