@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Adventure Engine</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="play">
+        <header class="topbar" id="statusBar"></header>
+        <div class="game-select">
+          <label for="gameSelect">Archive</label>
+          <select id="gameSelect"></select>
+        </div>
+        <article class="transcript" id="transcript" aria-live="polite"></article>
+        <form class="command-line" id="commandForm">
+          <label for="commandInput">What do you do?</label>
+          <div class="command-wrap">
+            <input
+              id="commandInput"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="look, examine letter, talk to mara, go north..."
+            />
+            <button type="submit">Enter</button>
+          </div>
+          <p class="suggestions" id="suggestions"></p>
+        </form>
+      </section>
+
+      <aside class="notebook" aria-label="Notebook">
+        <nav class="tabs" id="tabs"></nav>
+        <section class="tab-panel" id="tabPanel"></section>
+      </aside>
+    </main>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

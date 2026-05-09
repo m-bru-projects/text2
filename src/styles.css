@@ -1,0 +1,341 @@
+:root {
+  color-scheme: dark;
+  --bg: #080b0f;
+  --panel: #171512;
+  --panel-soft: #201d18;
+  --ink: #ede5d7;
+  --muted: #a99e8f;
+  --line: rgba(238, 207, 151, 0.22);
+  --accent: #d89a39;
+  --accent-soft: rgba(216, 154, 57, 0.14);
+  --blue: #0e1720;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(216, 154, 57, 0.08), transparent 24rem),
+    linear-gradient(135deg, #06080b, #101820 46%, #0b0d10);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.24;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 27rem);
+  gap: 1rem;
+  height: 100vh;
+  padding: 1rem;
+}
+
+.play,
+.notebook {
+  min-height: 0;
+  border: 1px solid var(--line);
+  background: rgba(8, 11, 15, 0.76);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.34);
+}
+
+.play {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.topbar {
+  min-height: 2.9rem;
+  padding: 1rem 1.2rem 0.8rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+}
+
+.game-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.2rem;
+  border-bottom: 1px solid rgba(238, 207, 151, 0.13);
+}
+
+.game-select label,
+.command-line label {
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+
+select,
+input,
+button {
+  font: inherit;
+}
+
+select {
+  max-width: 16rem;
+  color: var(--ink);
+  background: var(--blue);
+  border: 1px solid var(--line);
+  padding: 0.45rem 0.6rem;
+}
+
+.transcript {
+  overflow-y: auto;
+  padding: clamp(1.1rem, 2vw, 2rem);
+  scroll-behavior: smooth;
+}
+
+.entry {
+  max-width: 46rem;
+  margin: 0 0 1.15rem;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.08rem, 1.5vw, 1.28rem);
+  line-height: 1.72;
+}
+
+.entry.command {
+  color: var(--accent);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.92rem;
+}
+
+.entry.command::before {
+  content: "> ";
+}
+
+.entry.system {
+  color: var(--muted);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.96rem;
+}
+
+.entry.success {
+  color: #d7c6a5;
+}
+
+.entry.failure {
+  color: #9d9284;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.94rem;
+}
+
+.entry.failure::before {
+  color: rgba(216, 154, 57, 0.62);
+  content: "Noted: ";
+}
+
+.entry.dialogue {
+  border-left: 1px solid var(--accent);
+  padding-left: 1rem;
+}
+
+.entry.atmosphere {
+  color: #ceb98f;
+  font-style: italic;
+}
+
+.noun {
+  color: #f0bd64;
+  text-shadow: 0 0 1rem rgba(216, 154, 57, 0.22);
+}
+
+.command-line {
+  padding: 1rem 1.2rem 1.1rem;
+  border-top: 1px solid var(--line);
+  background: rgba(5, 8, 11, 0.76);
+}
+
+.command-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  margin-top: 0.55rem;
+}
+
+input {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #10151b;
+  color: var(--ink);
+  padding: 0.85rem 0.95rem;
+  outline: none;
+}
+
+input:focus,
+button:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+button {
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  color: var(--ink);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: rgba(216, 154, 57, 0.58);
+  color: #ffe2ab;
+}
+
+.suggestions {
+  margin: 0.65rem 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.notebook {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background:
+    linear-gradient(rgba(32, 29, 24, 0.92), rgba(23, 21, 18, 0.94)),
+    repeating-linear-gradient(0deg, transparent, transparent 1.55rem, rgba(238, 207, 151, 0.06) 1.62rem);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs button {
+  min-height: 2.6rem;
+  border-width: 0 1px 1px 0;
+  border-color: rgba(238, 207, 151, 0.14);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.tabs button.active {
+  color: var(--accent);
+  background: rgba(216, 154, 57, 0.08);
+}
+
+.tab-panel {
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem;
+}
+
+.list-panel h2 {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.note-row {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(238, 207, 151, 0.14);
+}
+
+.note-row h3 {
+  margin: 0 0 0.35rem;
+  color: var(--ink);
+  font-size: 0.98rem;
+}
+
+.note-row p,
+.empty {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.map {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.5rem;
+}
+
+.map-node {
+  position: relative;
+  border: 1px solid rgba(238, 207, 151, 0.23);
+  background: rgba(8, 11, 15, 0.38);
+  padding: 0.85rem 0.9rem;
+  color: var(--muted);
+  transform: rotate(-0.4deg);
+}
+
+.map-node:nth-child(even) {
+  transform: rotate(0.45deg);
+}
+
+.map-node.current {
+  color: var(--ink);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 1.8rem rgba(216, 154, 57, 0.08);
+}
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(32rem, 1fr) minmax(18rem, 42vh);
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .play,
+  .notebook {
+    min-height: 0;
+  }
+
+  .topbar {
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 520px) {
+  .shell {
+    padding: 0;
+    gap: 0;
+  }
+
+  .play,
+  .notebook {
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .game-select,
+  .command-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .game-select {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  select {
+    max-width: none;
+  }
+}
