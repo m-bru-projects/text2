@@ -25,6 +25,7 @@ export const lanternRoom = {
       id: "vestibule",
       name: "Observatory Vestibule",
       aliases: ["vestibule", "entry", "hall"],
+      map: { x: 32, y: 72 },
       summary: "A narrow entry beneath a sealed observatory dome.",
       description:
         "The [[Observatory Vestibule]] smells of wet wool and extinguished gas. A brass [[cabinet]] hangs beside a stairwell, and [[Iris Vale]] stands with one hand on the rail.",
@@ -75,6 +76,7 @@ export const lanternRoom = {
       id: "dome",
       name: "Telescope Dome",
       aliases: ["dome", "telescope", "observatory"],
+      map: { x: 32, y: 38 },
       summary: "The observatory's circular upper chamber.",
       description:
         "The [[Telescope Dome]] opens above you in ribs of black iron. The old [[telescope]] points nowhere useful. A narrow door leads east to the lantern platform.",
@@ -113,6 +115,7 @@ export const lanternRoom = {
       id: "platform",
       name: "Lantern Platform",
       aliases: ["platform", "lantern", "roof"],
+      map: { x: 70, y: 38 },
       summary: "A narrow exterior platform holding the signal lantern.",
       description:
         "Rain stripes the [[Lantern Platform]]. The signal [[lantern]] faces the harbor with a clouded [[lens]], and the city below is a scatter of black water and amber windows.",

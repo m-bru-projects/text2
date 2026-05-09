@@ -1,120 +1,45 @@
-# Text Adventure Engine Principles
+# Text Adventure Design Principles
 
-## Scope
+## Narrative Soul
+A good story in this engine must have "soul." It should move beyond pragmatic task-solving into an evocative, lived-in experience.
 
-This is a browser-based text adventure engine that can load multiple games at start, with more games added later through a game registry.
+- **Sensory Depth**: Go beyond visual descriptions. Include smells (ozone, dry lavender, damp earth), sounds (the groan of a hull, distant laughter), and physical sensations (the grit of sand, a throbbing bruise).
+- **Lived-in Worlds**: Locations should show the passage of time. Use clutter, stains, and personal artifacts to tell a story of who was there before.
+- **The "Why" vs the "What"**: Don't just describe a door; describe why it's scratched or why it smells like old wax.
+- **Dramatic Consequence**: Interactions that change the environment (opening a sealed bay, patching a hull, restoring power) should have heavy narrative weight. These state changes are opportunities for dramatic flair—shifting the atmosphere, changing the lighting, or altering the world's sensory profile.
+- **Dynamic Echoes**: The environment should not be static. Use state-driven atmospheric events to show the world responding to the crisis. As a situation escalates (e.g., a reactor failing), the random "echoes" in every room should become more intense and frequent.
+- **Global Vibe**: Use global world states to alter the prose of every location. A "Solar Flare" or "Deep Night" state should change the lighting and mood across the entire game, ensuring a cohesive and shifting atmosphere.
+- **Narrative Anchors**: A story must ground the player in a wider universe. Implicitly build the world through brand names, historical eras (e.g., "The Pre-Collapse"), and specific colony names. Every game should answer three questions for the player: What is the immediate crisis? What is the human history? What is the state of the wider world?
 
-The engine should stay clear and scalable: reusable runtime code belongs in the engine, while story-specific rooms, items, knowledge, people, dialogue, and actions belong in separate game files.
+## Character Humanity
+Characters are not just hint machines or gatekeepers; they are people with history.
 
-## Interaction
+- **Backstory**: Every character should have a life outside the current crisis. Allow the player to ask about their past, their family, and their feelings.
+- **Emotional Stakes**: Conversations should reveal the character's stakes in the world. Use tone and subtext to show fear, grief, or hope.
+- **Dynamic Presence**: People should react to the player's progress and the changing environment. Their descriptions and dialogue should shift as the story reaches critical points.
+- **Active Life**: NPCs should feel like they have agency. Whenever possible, give them routines or self-directed actions (e.g., moving between rooms, performing tasks) so they don't feel like static "statues" waiting for the player.
 
-The game is text-first. The player types commands rather than choosing from context-specific buttons.
+## Objects as Storytellers
+Objects are windows into the world's history and its inhabitants' lives.
 
-Supported command styles should remain forgiving:
+- **Narrative Weight**: An object shouldn't just be a key. It should be a locket with initials, a book with a handwritten note, or a piano missing a specific note that represents a lost memory.
+- **Responsive Examination**: Every highlighted noun (`[[noun]]`) in the prose must be examinable. This includes nouns appearing in room descriptions, exit previews, and even the `lockedPreview` of a closed door. If the player can see the word, they must be able to `look` at it.
+- **Narrative Dialogue**: NPCs should be able to discuss the world around them. Major environmental objects (like a sealed vault door or a flickering terminal) should always be valid conversation topics for nearby characters, helping to integrate the world and the people.
+- **Intuitive Failure**: If a player attempts a logical but incorrect action (e.g., trying to use a small tool where a large one is needed), provide a unique narrative response instead of a generic error. This guides the player toward the correct solution while maintaining the game's "soul."
+- **Noun Nesting**: Create a sense of tactile discovery through hierarchical examination. Looking at a desk reveals a drawer; looking at the drawer reveals a hidden compartment. This "peeling back" of the world makes it feel physically real.
+- **Historical Ghosts (Optional)**: For added flavor, contrast a room's current state with its past. Mention what a room *was* (a ballroom, a nursery) to heighten the emotional weight of what it *is* now (a graveyard, a flooded shell).
+- **Layered Lore**: Use non-interactive media—documents, logs, paintings, posters, and holographic recordings—to flesh out the narrative anchors. These items should provide the "why" and "where" of the universe, enriching the experience for players who take the time to study them.
+- **Forgiving Interaction**: Assume the player is part of the world. Support exhaustive synonyms, initials, and common-sense aliases so the player never has to "guess the verb" or the specific word.
 
-- `look`
-- `look noun`
-- `look at noun`
-- `examine noun`
-- `read noun`
-- `take noun`
-- `directions`
-- `look direction`
-- `north`, `south`, `east`, `west`, `up`, `down`, `in`, `out`
-- `talk to person`
-- `talk to person about topic`
-- `ask person about topic`
-- `use item with noun`
-- `use item on noun`
-- `go direction`
-- `inventory`
+## Navigation & Discovery
+The player should feel like an explorer, not a surveyor.
 
-The parser should prefer the player's likely intent. For example, `look gate` should inspect the gate, while plain `look` should describe the current location.
+- **Descriptive Exits**: Exits should be part of the narrative prose, not a separate UI list. Use `previews` to give the player a glimpse of the mood in the next room.
+- **World Consistency**: When the world changes (a door opens, a leak is patched), the room descriptions must update to reflect the new reality. Never repeat stale text.
+- **Knowledge Lifecycle**: Distinguish between transient flags (mechanical state) and Knowledge (narrative facts). Knowledge represents things the player can actually discuss with people.
 
-## Navigation
-
-Players should be able to understand available movement without guessing.
-
-The `directions` command should list the visible exits from the current location. It can include blocked exits when the player can perceive them, but it should clearly mark that they are not currently passable.
-
-The normal `look` command should also show possible exits after the room description, so the player does not need a separate command to understand basic movement.
-
-The player should also be able to inspect a direction with commands such as `look north`. This should provide a glimpse of what lies that way without moving the player. Direction previews can have different text when an exit is blocked, opened, changed, or otherwise affected by world state.
-
-Movement should accept both `go north` and bare direction commands such as `north`, `n`, `up`, or `down`. Movement and direction previews should share the same exit definitions, aliases, and conditions so the navigational prose and the actual movement rules stay aligned.
-
-## Nouns And Examination
-
-Nouns and important events are highlighted in the main text.
-
-Almost all visible nouns should be examinable, including nouns revealed by examining other nouns. Looking at objects should be a primary way to expose new details, unlock world state, and discover conversation topics.
-
-## Knowledge, Flags, And Story
-
-Knowledge is for facts the player can use in conversation. The Knowledge notebook should not become a dump of every internal discovery.
-
-Use flags for transient discoveries or mechanical state, such as:
-
-- revealing that an item is available
-- opening a route
-- recording that an object has been inspected
-- tracking one-off world changes
-
-Use story entries for important progress beats that the player may want to remember, even if they are not conversation topics.
-
-Knowledge can be hidden from the Knowledge notebook with `conversation: false` when it is useful internally but not something the player should naturally raise with people.
-
-Example: seeing a glimmer under a hatch should be a flag that makes a token available, not a Knowledge entry. Taking or examining the token can create Knowledge if that token becomes something people can discuss.
-
-## Conversation
-
-In general, the player should be able to talk to people about:
-
-- visited places
-- visible Knowledge entries
-- items currently in inventory
-
-Characters do not need bespoke answers for every possible topic. If a topic is valid but irrelevant to that character, they can give a neutral "doesn't care about that" response in their own voice.
-
-Authored dialogue can still require specific knowledge, inventory, flags, or world state before it unlocks. Locked dialogue should give an in-world hint rather than a mechanical error.
-
-## Objects And World Effects
-
-Object interaction and world interaction are core progress systems. Using, taking, examining, or talking about things can have large effects on the world around the player.
-
-Effects may change flags, reveal knowledge, add story entries, add or remove inventory, open routes, or alter what future commands can do.
-
-Use commands are interpreted as action lookups in the current game data. `use item with target` and `use item on target` are equivalent. The parser normalizes both sides, then the engine searches for an action whose `item` or action alias matches the first side, whose `with` value matches the second side, and whose location, inventory, knowledge, and flag conditions are satisfied.
-
-Direct manipulation verbs such as `open cabinet`, `press switch`, `turn wheel`, `align lantern`, or `send signal` are interpreted as `use noun` with no secondary target. More specific commands such as `align lantern to Aster` are interpreted as `use lantern with Aster`.
-
-If an action needs an item in inventory, it should declare that requirement explicitly. If no matching valid action exists, the engine should give a quiet failure such as "Nothing changes."
-
-World changes must also change future prose. If an action opens a gate, breaks a lock, moves an object, changes a character's attitude, or otherwise alters the fiction, later `look` and `examine` output should describe the new state rather than repeating stale default text.
-
-Game data should support conditional descriptions for locations, objects, people, and other examinable nouns. These descriptions should be driven by the same flags, inventory, and knowledge conditions that drive mechanics, so the written world and the simulated world stay aligned.
-
-## Endings
-
-Short games should still have a real ending or win condition. The final state should be represented in game data, not only implied by prose.
-
-When a game reaches an ending, the engine should record it, show a clear ending message, and stop accepting further world-changing commands for that run.
-
-## Atmospheric Events
-
-Atmospheric events occur every few turns, with some randomness.
-
-They are context-specific and location-specific. They should be visually distinct in the UI, but their prose should not literally start with labels such as `Atmosphere:`.
-
-Atmospheric events should add mood and pressure without pretending to be normal command feedback.
-
-## Feedback Style
-
-Different output types should remain visually distinct:
-
-- Narrative, successful actions, and item-taking should use the main literary text style.
-- Dialogue should feel like spoken prose and remain easy to scan.
-- Failed or blocked commands should use a quieter feedback style.
-- Atmospheric events should have their own restrained visual treatment.
-
-Taking an item should not look like a failed command.
+## Story Design
+- **Puzzle Progression**: A story should never be a single monolithic puzzle. It should be a series of interconnected or parallel puzzles that build momentum toward the ending. Solving one mystery should naturally provide the clues or items needed for the next.
+- **Critical Path & Clues**: Ensure every puzzle is clued through atmospheric details or conversation before it becomes a blocker.
+- **Pacing**: Alternate moments of tense investigation with atmospheric release and narrative payoff.
+- **Endings**: Every story should have a definitive emotional payoff that is recorded in the game's story log.

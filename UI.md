@@ -22,7 +22,9 @@ Three zones:
      * Knowledge items gained
      * Inventory
 
-   * The map can be node-based rather than literal.
+   * The map should be a 2D spatial view.
+   * The map can still be node-based rather than geographically literal, but positions should imply direction, adjacency and movement relationships.
+   * Draw visible connections between discovered locations.
    * Locations not visited should be invisible
    * Keep this panel supportive, not dominant.
 

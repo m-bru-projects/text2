@@ -2,6 +2,10 @@ import { normalize, parseCommand } from "./commands.js";
 
 const BASE_SUGGESTIONS = ["look", "directions", "look direction", "examine noun", "talk to person", "ask person about topic", "go direction", "inventory"];
 
+function normalizeTopicKey(value) {
+  return normalize(String(value).replace(/([a-z0-9])([A-Z])/g, "$1 $2"));
+}
+
 export class AdventureEngine {
   constructor(game) {
     this.game = game;
@@ -30,10 +34,7 @@ export class AdventureEngine {
       log: this.state.log,
       status: this.status(location),
       suggestions: BASE_SUGGESTIONS,
-      map: this.visibleLocations().map((place) => ({
-        name: place.name,
-        current: place.id === location.id,
-      })),
+      map: this.mapView(location),
       story: this.state.story,
       people: this.visiblePeople(),
       places: this.visibleLocations().map((place) => ({
@@ -71,11 +72,15 @@ export class AdventureEngine {
 
   describeLocation() {
     const location = this.currentLocation();
+    const globalContent = this.stateContent(this.game, "description");
     const content = this.stateContent(location, "description");
-    this.addLog("narrative", content.text);
+    const exitText = this.exitDescriptionText();
+    
+    const parts = [globalContent.text, content.text, exitText].filter(Boolean);
+    this.addLog("narrative", parts.join("\n\n"));
+    
     this.reveal(content.reveals);
     this.applyEffects(content.effects);
-    this.describeDirections({ quiet: true });
   }
 
   showInventory() {
@@ -141,6 +146,19 @@ export class AdventureEngine {
     this.addLog("system", `Ways from here: ${labels.join("; ")}.`);
   }
 
+  exitDescriptionText() {
+    const exits = this.currentExits();
+    if (!exits.length) return "";
+
+    const descriptions = exits.map((exit) => {
+      const place = this.game.locations[exit.destinationId];
+      const state = this.exitIsOpen(exit.config) ? "leads" : "is closed";
+      return `${exit.direction} ${state} toward [[${place.name}]]`;
+    });
+
+    return `From here, ${descriptions.join("; ")}.`;
+  }
+
   describeExit(exit) {
     const open = this.exitIsOpen(exit.config);
     const fallback = open
@@ -163,7 +181,7 @@ export class AdventureEngine {
     }
 
     this.state.inventory.add(item.id);
-    this.addLog("success", `You take the [[${item.name}]].`);
+    this.addLog("success", item.takeText ?? `You take the [[${item.name}]].`);
     this.reveal(item.reveals);
     this.applyEffects(item.effects);
   }
@@ -235,7 +253,9 @@ export class AdventureEngine {
 
   findAtmosphericEvent() {
     const location = this.currentLocation();
-    const candidates = (location.atmosphere ?? []).filter((event) => {
+    const pools = [location.atmosphere ?? [], this.game.atmosphere ?? []];
+    
+    const candidates = pools.flat().filter((event) => {
       const every = event.everyTurns ?? 3;
       return this.state.turn > 0 && this.state.turn % every === 0 && this.conditionsMet(event.conditions);
     });
@@ -256,6 +276,9 @@ export class AdventureEngine {
     }
     for (const id of effects.removeKnowledge ?? []) this.state.knowledge.delete(id);
     for (const id of effects.removeInventory ?? []) this.state.inventory.delete(id);
+    for (const [personId, locationId] of Object.entries(effects.movePerson ?? {})) {
+      if (this.game.people[personId]) this.game.people[personId].locationId = locationId;
+    }
     if (effects.win) this.win(effects.win);
   }
 
@@ -287,6 +310,53 @@ export class AdventureEngine {
     return Object.values(this.game.locations).filter((place) => this.state.visited.has(place.id));
   }
 
+  mapView(currentLocation) {
+    const visible = this.visibleLocations();
+    const visibleIds = new Set(visible.map((place) => place.id));
+    return {
+      locations: visible.map((place, index) => ({
+        id: place.id,
+        name: place.name,
+        current: place.id === currentLocation.id,
+        x: place.map?.x ?? this.fallbackMapPosition(index).x,
+        y: place.map?.y ?? this.fallbackMapPosition(index).y,
+      })),
+      connections: this.mapConnections(visibleIds),
+    };
+  }
+
+  mapConnections(visibleIds) {
+    const seen = new Set();
+    const connections = [];
+
+    for (const location of Object.values(this.game.locations)) {
+      if (!visibleIds.has(location.id)) continue;
+
+      for (const exit of this.exitsForLocation(location)) {
+        if (!visibleIds.has(exit.destinationId)) continue;
+
+        const key = [location.id, exit.destinationId].sort().join(":");
+        if (seen.has(key)) continue;
+
+        seen.add(key);
+        connections.push({
+          from: location.id,
+          to: exit.destinationId,
+          open: this.exitIsOpen(exit.config),
+        });
+      }
+    }
+
+    return connections;
+  }
+
+  fallbackMapPosition(index) {
+    return {
+      x: 18 + (index % 3) * 32,
+      y: 22 + Math.floor(index / 3) * 28,
+    };
+  }
+
   stateText(entry, field) {
     return this.stateContent(entry, field).text;
   }
@@ -311,7 +381,11 @@ export class AdventureEngine {
   }
 
   currentExits() {
-    return Object.entries(this.currentLocation().exits ?? {}).map(([direction, config]) => {
+    return this.exitsForLocation(this.currentLocation());
+  }
+
+  exitsForLocation(location) {
+    return Object.entries(location.exits ?? {}).map(([direction, config]) => {
       const normalizedConfig = typeof config === "string" ? { to: config } : config;
       return {
         direction,
@@ -353,6 +427,7 @@ export class AdventureEngine {
   resolveConversationTopic(topic) {
     const pools = [
       ...this.visibleLocations().map((entry) => ({ ...entry, type: "place" })),
+      ...this.visibleNouns().map((entry) => ({ ...entry, type: "noun" })),
       ...this.visibleKnowledge().map((entry) => ({ ...entry, type: "knowledge" })),
       ...this.visibleInventory().map((entry) => ({ ...entry, type: "item" })),
     ];
@@ -360,11 +435,15 @@ export class AdventureEngine {
     return pools.find((entry) => this.matches(entry, topic)) ?? null;
   }
 
+  visibleNouns() {
+    return Object.values(this.currentLocation().nouns ?? {}).filter((entry) => this.isAccessible(entry));
+  }
+
   findDialogueTopicKey(person, topic, resolvedTopic) {
     return Object.keys(person.dialogue.topics ?? {}).find((key) => {
-      if (normalize(key) === topic) return true;
+      if (normalizeTopicKey(key) === topic) return true;
       if (!resolvedTopic) return false;
-      return this.matches(resolvedTopic, normalize(key));
+      return this.matches(resolvedTopic, normalizeTopicKey(key));
     });
   }
 

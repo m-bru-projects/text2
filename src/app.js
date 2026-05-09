@@ -111,9 +111,33 @@ function renderTab(tab, view) {
 function renderMap(view) {
   const wrap = document.createElement("div");
   wrap.className = "map";
-  for (const place of view.map) {
+  const byId = new Map(view.map.locations.map((place) => [place.id, place]));
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "map-lines");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("preserveAspectRatio", "none");
+
+  for (const connection of view.map.connections) {
+    const from = byId.get(connection.from);
+    const to = byId.get(connection.to);
+    if (!from || !to) continue;
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", from.x);
+    line.setAttribute("y1", from.y);
+    line.setAttribute("x2", to.x);
+    line.setAttribute("y2", to.y);
+    line.setAttribute("class", connection.open ? "map-line" : "map-line closed");
+    svg.append(line);
+  }
+
+  wrap.append(svg);
+
+  for (const place of view.map.locations) {
     const node = document.createElement("div");
     node.className = place.current ? "map-node current" : "map-node";
+    node.style.left = `${place.x}%`;
+    node.style.top = `${place.y}%`;
     node.textContent = place.name;
     wrap.append(node);
   }

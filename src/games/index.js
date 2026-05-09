@@ -1,6 +1,7 @@
-import { underbridgeLetter } from "./underbridge-letter.js";
 import { lanternRoom } from "./lantern-room.js";
-import { clockworkHeart } from "./clockwork-heart.js";
-import { tideCaller } from "./tide-caller.js";
+import { keplerStation } from "./kepler-station.js";
+import { rainglassHouse } from "./rainglass-house.js";
+import { gildedAnchor } from "./gilded-anchor.js";
+import { silentArchive } from "./silent-archive.js";
 
-export const games = [underbridgeLetter, lanternRoom, clockworkHeart, tideCaller];
+export const games = [silentArchive, gildedAnchor, keplerStation, lanternRoom, rainglassHouse];

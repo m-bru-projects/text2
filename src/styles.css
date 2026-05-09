@@ -271,18 +271,49 @@ button:hover {
 
 .map {
   position: relative;
-  display: grid;
-  gap: 0.9rem;
-  padding: 0.5rem;
+  min-height: 23rem;
+  overflow: hidden;
+  border: 1px solid rgba(238, 207, 151, 0.16);
+  background:
+    linear-gradient(rgba(8, 11, 15, 0.18), rgba(8, 11, 15, 0.18)),
+    linear-gradient(90deg, rgba(238, 207, 151, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(238, 207, 151, 0.05) 1px, transparent 1px);
+  background-size: auto, 2rem 2rem, 2rem 2rem;
+}
+
+.map-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-line {
+  stroke: rgba(216, 154, 57, 0.42);
+  stroke-linecap: round;
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.map-line.closed {
+  stroke: rgba(169, 158, 143, 0.32);
+  stroke-dasharray: 3 3;
 }
 
 .map-node {
-  position: relative;
+  position: absolute;
+  z-index: 1;
+  width: min(9rem, 34%);
+  min-height: 3.2rem;
   border: 1px solid rgba(238, 207, 151, 0.23);
   background: rgba(8, 11, 15, 0.38);
-  padding: 0.85rem 0.9rem;
+  padding: 0.65rem 0.75rem;
   color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.25;
+  text-align: center;
   transform: rotate(-0.4deg);
+  translate: -50% -50%;
 }
 
 .map-node:nth-child(even) {
